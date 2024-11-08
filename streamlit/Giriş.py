@@ -6,7 +6,7 @@ TITLE = "Trader Mentor AI'a hoşgeldiniz"
 # Page configuration with updated icon
 st.set_page_config(
     page_title="TraderMentorAI",
-    page_icon='/workspaces/GitHub/streamlit/images/Leonardo_Phoenix_Create_a_modern_sleek_logo_for_the_stock_trad_2.jpg',
+    page_icon="C:\\Users\\rusen\\source\\repos\\Proje\\Proje\\TradeMentor-AI\\streamlit\\images\\Leonardo_Phoenix_Create_a_modern_sleek_logo_for_the_stock_trad_3.jpg",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
@@ -25,7 +25,8 @@ st.markdown(
 )
 
 # Load and resize the main page image
-image_path = '/workspaces/GitHub/streamlit/images/Leonardo_Phoenix_Create_a_modern_sleek_logo_for_the_stock_trad_2.jpg'
+image_path = "C:\\Users\\rusen\\source\\repos\\Proje\\Proje\\TradeMentor-AI\\streamlit\\images\\Leonardo_Phoenix_Create_a_modern_sleek_logo_for_the_stock_trad_3.jpg"
+
 image = Image.open(image_path)
 image = image.resize((600, 600))
 
@@ -48,4 +49,4 @@ st.write("""
 """)
 
 # Bu bölümü ekranın en altına yerleştirmek için ayraç ekleyebiliriz.
-st.markdown("<br><br>", unsafe_allow_html=True)  # Ekstra boşluk
+st.markdown("<br><br>", unsafe_allow_html=True)

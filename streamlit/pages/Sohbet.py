@@ -1,84 +1,58 @@
+import ollama
 import streamlit as st
-import replicate
-import os
 
-# App title
-st.set_page_config(page_title="TradeMentor Ai")
+st.title("Ollama Python Chatbot")
 
-# Replicate Credentials
-with st.sidebar:
-    st.title('TradeMentor Ai Chat Bot')
-    # API anahtarı `secrets.toml` dosyasından alınıyor
-    if 'REPLICATE_API_KEY' in st.secrets:
-        st.success('API key already provided!', icon='✅')
-        replicate_api = st.secrets['REPLICATE_API_KEY']
-    else:
-        replicate_api = st.text_input('Enter Replicate API token:', type='password')
-        if not (replicate_api.startswith('r8_') and len(replicate_api) == 40):
-            st.warning('Please enter your credentials!', icon='⚠️')
-        else:
-            st.success('Proceed to entering your prompt message!', icon='👉')
-            # Çevresel değişkene API anahtarını doğru şekilde ata
-            os.environ['REPLICATE_API_KEY'] = replicate_api
+# Geçmişi başlat
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
 
-    st.subheader('Models and parameters')
-    selected_model = st.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
-    if selected_model == 'Llama2-7B':
-        llm = 'a16z-infra/llama7b-v2-chat:4f0a4744c7295c024a1de15e1a63c880d3da035fa1f49bfd344fe076074c8eea'
-    elif selected_model == 'Llama2-13B':
-        llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
-    temperature = st.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
-    top_p = st.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
-    max_length = st.slider('max_length', min_value=32, max_value=128, value=120, step=8)
-    
+# Modeli başlat
+if "model" not in st.session_state:
+    st.session_state["model"] = None  # Başlangıçta model belirlenmemiş
 
-# Store LLM generated responses
-if "messages" not in st.session_state.keys():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+# Mevcut modelleri listele
+models = [model["name"] for model in ollama.list()["models"]]
 
-# Display or clear chat messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+# Eğer daha önce kaydedilen model mevcutsa, onu seç
+if st.session_state["model"] not in models:
+    st.session_state["model"] = models[0]  # Mevcut modellerden ilkini seç
 
-def clear_chat_history():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+# Kullanıcıya model seçtirme
+st.session_state["model"] = st.selectbox("Choose your model", models, index=models.index(st.session_state["model"]))
 
-# Function for generating LLaMA2 response
-def generate_llama2_response(prompt_input):
-    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
-    for dict_message in st.session_state.messages:
-        if dict_message["role"] == "user":
-            string_dialogue += "User: " + dict_message["content"] + "\n\n"
-        else:
-            string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
-    
-    # API çağrısında api_token parametresini kullanıyoruz
-    output = replicate.run(
-        llm,
-        input={"prompt": f"{string_dialogue} {prompt_input} Assistant: ",
-               "temperature": temperature, "top_p": top_p, "max_length": max_length, "repetition_penalty": 1},
-        api_token=os.getenv('REPLICATE_API_KEY')  # Çevresel değişkeni kullanıyoruz
+# Modelin yanıtlarını akış olarak getiren fonksiyon
+def model_res_generator():
+    stream = ollama.chat(
+        model=st.session_state["model"],
+        messages=st.session_state["messages"],
+        stream=True,
     )
-    return output
+    full_message = ""
+    # Gelen her bir akış parçasını birleştir
+    for chunk in stream:
+        full_message += chunk["message"]["content"]
+        yield full_message  # Yanıtı anlık olarak gönder
 
-# User-provided prompt
-if prompt := st.chat_input(disabled=not replicate_api):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+# Chat geçmişini görüntüle
+for message in st.session_state["messages"]:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# Kullanıcının yeni mesajını al
+if prompt := st.chat_input("What is up?"):
+    # Kullanıcının mesajını geçmişe ekle
+    st.session_state["messages"].append({"role": "user", "content": prompt})
+
+    # Kullanıcının mesajını göster
     with st.chat_message("user"):
-        st.write(prompt)
+        st.markdown(prompt)
 
-# Generate a new response if last message is not from assistant
-if st.session_state.messages[-1]["role"] != "assistant":
+    # Assistant'ın yanıtını almak için stream başlat
     with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            response = generate_llama2_response(prompt)
-            placeholder = st.empty()
-            full_response = ''
-            for item in response:
-                full_response += item
-                placeholder.markdown(full_response)
-            placeholder.markdown(full_response)
-    message = {"role": "assistant", "content": full_response}
-    st.session_state.messages.append(message)
+        message = ""
+        for chunk in model_res_generator():
+            message = chunk  # Yanıtı anlık olarak güncelle
+            st.markdown(message)  # Anlık olarak göster
+        # Assistant yanıtını geçmişe ekle
+        st.session_state["messages"].append({"role": "assistant", "content": message})
