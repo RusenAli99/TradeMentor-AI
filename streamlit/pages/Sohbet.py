@@ -21,18 +21,17 @@ if st.session_state["model"] not in models:
 # Kullanıcıya model seçtirme
 st.session_state["model"] = st.selectbox("Choose your model", models, index=models.index(st.session_state["model"]))
 
-# Modelin yanıtlarını akış olarak getiren fonksiyon
-def model_res_generator():
+# Modelin tam yanıtını döndüren fonksiyon
+def get_full_response():
     stream = ollama.chat(
         model=st.session_state["model"],
         messages=st.session_state["messages"],
         stream=True,
     )
     full_message = ""
-    # Gelen her bir akış parçasını birleştir
     for chunk in stream:
-        full_message += chunk["message"]["content"]
-        yield full_message  # Yanıtı anlık olarak gönder
+        full_message += chunk["message"]["content"]  # Gelen tüm parçaları birleştir
+    return full_message
 
 # Chat geçmişini görüntüle
 for message in st.session_state["messages"]:
@@ -48,11 +47,10 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Assistant'ın yanıtını almak için stream başlat
+    # Assistant'ın tam yanıtını al
     with st.chat_message("assistant"):
-        message = ""
-        for chunk in model_res_generator():
-            message = chunk  # Yanıtı anlık olarak güncelle
-            st.markdown(message)  # Anlık olarak göster
+        message = get_full_response()  # Tüm parçaları birleştirip tek yanıt al
+        st.markdown(message)  # Yanıtı göster
+
         # Assistant yanıtını geçmişe ekle
         st.session_state["messages"].append({"role": "assistant", "content": message})
