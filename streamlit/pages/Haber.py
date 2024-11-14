@@ -4,7 +4,7 @@ import requests
 # NewsAPI anahtarınızı buraya ekleyin
 api_key = "dc482f4ae1fc4005bd3b6887d20e8c90"
 
-# Streamlit ile başlık ve arama terimi almak
+# Streamlit ile başlık ve arama terimi almak.
 st.title('Türkçe Haber Başlıkları')
 query = st.text_input('Arama Terimi Girin:', 'Teknoloji')
 
