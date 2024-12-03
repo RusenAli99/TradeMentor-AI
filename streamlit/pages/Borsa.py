@@ -3,6 +3,17 @@ import datetime
 import yfinance as yf
 import time
 import requests
+st.set_page_config(
+    page_title="TraderMentorAI",
+    page_icon="C:\\Users\\rusen\\source\\repos\\Proje\\Proje\\TradeMentor-AI\\streamlit\\images\\Leonardo_Phoenix_Create_a_modern_sleek_logo_for_the_stock_trad_2.jpg", 
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    }
+)
 
 # NewsAPI anahtarınız
 api_key = "dc482f4ae1fc4005bd3b6887d20e8c90"
