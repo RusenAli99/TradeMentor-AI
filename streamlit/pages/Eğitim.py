@@ -17,5 +17,5 @@ with st.expander("1.1 - Kripto Borsasına Yeni Girdim Nelere Dikkat Etmeliyim?")
     st.write("Bu konu hakkında daha fazla bilgi almak için aşağıdaki videoyu izleyebilirsiniz.")
     
     # Video yalnızca başlık genişletildiğinde gösterilir
-    video_path = "C:\\Users\\rusen\\Desktop\\1203(1).mp4"
+    video_path = "C:\\Users\\rusen\\Desktop\\veriproje\\1203(1).mp4"
     st.video(video_path)
