@@ -14,10 +14,10 @@ st.set_page_config(
 
 # MongoDB bağlantısı
 client = MongoClient("mongodb://localhost:27017/")
-db = client["proje"]  # Kendi veritabanı adınızı yazın
+db = client["TraderMentorAI"]  # Kendi veritabanı adınızı yazın
 
 # Kripto para birimlerinin listesi
-cryptos = ["BTC", "ADA", "BNB", "DOGE", "DOGS", "ETH", "MATIC", "NOT", "SHIB", "SOL", "TON", "XRP"]
+cryptos = ["BTC", "ADA", "BNB", "DOGE", "DOGS", "ETH", "MATIC", "NOT", "SHIB", "SOL", "XRP"]
 
 # Kripto para seçimi
 selected_crypto = st.selectbox("Bir kripto para birimi seçin", cryptos)
@@ -119,3 +119,5 @@ def contact_bubble():
 
 # İletişim baloncuğunu göster
 contact_bubble()
+
+

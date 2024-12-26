@@ -44,8 +44,8 @@ st.subheader("Hakkımızda")
 st.write("""
 **Telefon Numarası**: +90 555 123 4567  
 **E-posta**: info@tradermentorai.com  
-**Adres**: Büyükdere Caddesi No:123, Maslak, İstanbul  
-**Merkez Adresi**: Trader Mentor AI Merkezi, İstanbul, Türkiye  
+**Adres**: Abdi İpekçi Caddesi No:123, Pendik, İstanbul  
+**Merkez Adresi**: Trader Mentor AI Merkezi, Pendik , İstanbul, Türkiye  
 """)
 
 # Bu bölümü ekranın en altına yerleştirmek için ayraç ekleyebiliriz.
